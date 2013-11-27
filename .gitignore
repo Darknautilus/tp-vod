@@ -11,3 +11,9 @@
 *.lai
 *.la
 *.a
+
+# Vim Stuff
+*.swp
+
+# Project specific stuff
+bin
