@@ -18,3 +18,4 @@
 # Project specific stuff
 bin
 Makefile
+moc_*

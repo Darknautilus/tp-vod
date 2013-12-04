@@ -1,4 +1,6 @@
+QT += network
 CONFIG += qt
 TARGET = bin/insavod
-HEADERS = 
-SOURCES = insavod.cpp
+HEADERS = Server.h 
+SOURCES = insavod.cpp \
+					Server.cpp
