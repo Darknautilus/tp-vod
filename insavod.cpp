@@ -1,20 +1,23 @@
 #include <QApplication>
+#include <QWidget>
+#include <QLabel>
+#include <QListWidget>
 #include <QPushButton>
 #include <iostream>
 
+#include "fenetreServ.h"
 #include "Server.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc,argv);
-
-	QPushButton button("Click to plop!");
+	fenetreServ Serveur;
 
 	Server serv;
 	serv.listen(QHostAddress::Any, 8081);
 
-	QObject::connect(&button, SIGNAL(clicked()), &serv, SLOT(serverMessage()));
-	button.show();
+  Serveur.show();
+
 
 	return app.exec();
 }

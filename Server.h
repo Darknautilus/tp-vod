@@ -10,11 +10,12 @@ class Server : public QTcpServer
 	public:
 		Server();
 		~Server();
-	
+
 	public slots:
 		void clientWelcomeMessage();
 		void connectionFeedback();
-		void serverMessage();	
+		void serverMessage();
+	//	void remplirListe(QListWidget *list);	
 };
 
 #endif

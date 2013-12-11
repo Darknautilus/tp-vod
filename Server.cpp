@@ -20,10 +20,18 @@ void Server::connectionFeedback()
 	std::cout << "Nouvelle connexion !" << std::endl;
 }
 
+
 void Server::serverMessage()
 {
 	std::cout << "plop" << std::endl;
 }
+
+/*
+void Server::remplirListe(QListWidget *liste) 
+{
+}
+*/
+
 
 void Server::clientWelcomeMessage()
 {
