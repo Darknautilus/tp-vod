@@ -26,13 +26,8 @@ void Server::serverMessage()
 	std::cout << "plop" << std::endl;
 }
 
-/*
-void Server::remplirListe(QListWidget *liste) 
-{
-}
-*/
 
-
+:wa
 void Server::clientWelcomeMessage()
 {
 	QTcpSocket *client = nextPendingConnection();

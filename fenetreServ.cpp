@@ -20,7 +20,7 @@ fenetreServ :: ~fenetreServ()
 
 void fenetreServ :: ajouterListe() 
 {
-	new QListWidgetItem(tr("plop"), liste);
+	new QListWidgetItem(tr("Nouvelle connexion"), liste);
 }
 
 
