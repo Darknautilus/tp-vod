@@ -1,6 +1,7 @@
 #include "fenetreServ.h"
+#include "httpServer.h"
 
-fenetreServ :: fenetreServ()
+fenetreServ::fenetreServ()
 {
 	this->resize(1000,500);
 	button = new QPushButton ("Click to plop!", this);
@@ -8,17 +9,29 @@ fenetreServ :: fenetreServ()
 	label = new QLabel("Bienvenue sur notre super Serveur de la mort qui tue", this);
 	liste = new QListWidget(this);
 	liste->move(0,20);
-
-	QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(ajouterListe()));
-}
-
-fenetreServ :: ~fenetreServ()
-{
 	
+	httpserv = new httpServer(QString("HTTP-Server"), 8081, this);
+	httpserv->start();
+	
+	QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(button_clicked()));
 }
 
+fenetreServ::~fenetreServ()
+{
+	delete httpserv;
+}
 
-void fenetreServ :: ajouterListe() 
+void fenetreServ::printMessage(QString message)
+{
+	new QListWidgetItem(message, liste);
+}
+
+void fenetreServ::button_clicked()
+{
+	printMessage(QString("plop"));
+}
+
+void fenetreServ::newConnection() 
 {
 	new QListWidgetItem(tr("Nouvelle connexion"), liste);
 }

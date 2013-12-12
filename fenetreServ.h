@@ -8,6 +8,8 @@
 #include <QPushButton>
 #include <QListWidgetItem>
 
+class httpServer;
+
 class fenetreServ : public QWidget
 {
 	Q_OBJECT
@@ -15,15 +17,21 @@ class fenetreServ : public QWidget
 	public:
 		fenetreServ();
 		virtual ~fenetreServ();
-		//void remplirListe();
+
+		void printMessage(QString);
 
 	public slots: 
-		void ajouterListe();
+		void newConnection();
+
+	private slots:
+		void button_clicked();
 
 	private:
 		QListWidget *liste;
 		QPushButton *button;
 		QLabel *label;
+
+		httpServer *httpserv;
 };
 
 	

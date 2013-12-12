@@ -4,30 +4,20 @@
 #include <QStringList>
 #include <QTextStream>
 
-#include "Server.h"
+#include "httpServer.h"
+#include "fenetreServ.h"
 
 using namespace std;
 
-Server::Server(QString pCatalog)
+httpServer::httpServer(QString _name, int _port, fenetreServ *_view) : insavodServer(_name, _view, _port)
 {
-	if(!QFile::exists(pCatalog))
-	{
-		throw SERVER_ERRORS::CATALOG_NOT_FOUND;
-	}
-	else
-	{
-		catalog = new QFile(pCatalog);
-	}
-	QObject::connect(this, SIGNAL(newConnection()), this, SLOT(connectionFeedback()));
 }
 
-Server::~Server()
+httpServer::~httpServer()
 {
-	qDeleteAll(clientConnections);
-	delete catalog;
 }
 
-void Server::incomingConnection(int socketDesc)
+void httpServer::incomingConnection(int socketDesc)
 {
 	QTcpSocket *client = new QTcpSocket();
 	client->setSocketDescriptor(socketDesc);
@@ -36,7 +26,7 @@ void Server::incomingConnection(int socketDesc)
 	clientConnections.append(client);
 }
 
-void Server::getClientRequest()
+void httpServer::getClientRequest()
 {
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());	
 	if(client->canReadLine())
@@ -51,7 +41,7 @@ void Server::getClientRequest()
 			QTextStream is(&catalogue);
 			os.setAutoDetectUnicode(true);
 			is.setAutoDetectUnicode(true);
-			os << "HTTP/1.0 200 OK\r\nServer: TP_Serveur_3208\r\nConnection: Keep-Alive\r\nContent-Type: text/txt\r\nContent-Length: " << catalogue.size() << "\r\n\r\n";
+			os << "HTTP/1.0 200 OK\r\nhttpServer: TP_Serveur_3208\r\nConnection: Keep-Alive\r\nContent-Type: text/txt\r\nContent-Length: " << catalogue.size() << "\r\n\r\n";
 			QString line;
 			do
 			{
@@ -67,18 +57,7 @@ void Server::getClientRequest()
 	}	
 }
 
-void Server::connectionFeedback()
-{
-	std::cout << "Nouvelle connexion !" << std::endl;
-}
-
-
-void Server::serverMessage()
-{
-	std::cout << "plop" << std::endl;
-}
-
-void Server::clientDisconnected()
+void httpServer::clientDisconnected()
 {
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());		 
 	if (!client)

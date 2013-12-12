@@ -2,8 +2,10 @@ QT += network
 QMAKE_CXXFLAGS += -std=c++0x
 CONFIG += qt
 TARGET = bin/insavod
-HEADERS += Server.h \
-					fenetreServ.h
+HEADERS += httpServer.h \
+					fenetreServ.h \
+					insavodServer.h
 SOURCES += insavod.cpp \
-					Server.cpp \
-					fenetreServ.cpp
+					httpServer.cpp \
+					fenetreServ.cpp \
+					insavodServer.cpp
