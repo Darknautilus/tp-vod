@@ -16,6 +16,9 @@ class httpServer : public QTcpServer, public insavodServer
 	public:
 		httpServer(QString, int, fenetreServ *);
 		~httpServer();
+
+		void start();
+		void stop();
 		
 	protected:
 		virtual void incomingConnection(int);

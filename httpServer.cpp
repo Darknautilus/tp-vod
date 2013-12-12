@@ -17,12 +17,25 @@ httpServer::~httpServer()
 {
 }
 
+void httpServer::start()
+{
+	insavodServer::start();
+	listen(addr,port);
+}
+
+void httpServer::stop()
+{
+	insavodServer::stop();
+	close();
+}
+
 void httpServer::incomingConnection(int socketDesc)
 {
 	QTcpSocket *client = new QTcpSocket();
 	client->setSocketDescriptor(socketDesc);
 	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
 	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+	viewMessage(QString("nouvelle connexion !"));
 	clientConnections.append(client);
 }
 
@@ -34,7 +47,7 @@ void httpServer::getClientRequest()
 		QStringList lines = QString(client->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
 		if(lines[0] == "GET" && QFile::exists(lines[1]))
 		{
-			cout << "Envoi de " << lines[1].toLocal8Bit().constData() << endl;
+			viewMessage(QString("Envoi de ")+lines[1]);
 			QFile catalogue(lines[1].toLocal8Bit().constData());
 			catalogue.open(QIODevice::ReadOnly);
 			QTextStream os(client);
@@ -64,4 +77,5 @@ void httpServer::clientDisconnected()
 		return;		 
 	clientConnections.removeAll(client);
 	client->deleteLater();
+	viewMessage(QString::fromUtf8("connexion terminée"));
 }

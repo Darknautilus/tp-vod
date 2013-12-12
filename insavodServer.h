@@ -24,6 +24,8 @@ class insavodServer
 		virtual void start();
 		virtual void stop();
 
+		void viewMessage(QString);
+
 	protected:
 		QString name;
 		int port;

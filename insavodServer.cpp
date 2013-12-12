@@ -11,18 +11,15 @@ insavodServer::~insavodServer()
 
 void insavodServer::start()
 {
-	QString buffer;
-	QTextStream out(&buffer, QIODevice::ReadWrite);
-	out << name << " démarré sur le port " << port;
-	view->printMessage(buffer);
+	viewMessage(QString::fromUtf8("démarré sur le port ")+QString::number(port));
 }
 
 void insavodServer::stop()
 {
-	QString buffer;
-	QTextStream out(&buffer, QIODevice::ReadWrite);
-	out.setAutoDetectUnicode(true);
-	out << name << " arrêté sur le port " << port;
-	view->printMessage(buffer);
+	viewMessage(QString::fromUtf8("arrêté sur le port ")+QString::number(port));
 }
 
+void insavodServer::viewMessage(QString message)
+{
+	view->printMessage(QString("[")+name+QString("] ")+message);
+}
