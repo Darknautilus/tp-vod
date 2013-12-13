@@ -1,0 +1,4 @@
+ServerAddress: 127.0.0.1
+ServerPort: 8081
+Object ID=1 name=ftl type=JPEG address=127.0.0.1 port=8081 protocol=TCP_PULL ips=1
+Object ID=2 name=ftl2 type=JPEG address=127.0.0.1 port=8081 protocol=TCP_PUSH ips=1

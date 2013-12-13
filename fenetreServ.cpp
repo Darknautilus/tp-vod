@@ -31,9 +31,3 @@ void fenetreServ::button_clicked()
 	printMessage(QString("plop"));
 }
 
-void fenetreServ::newConnection() 
-{
-	new QListWidgetItem(tr("Nouvelle connexion"), liste);
-}
-
-

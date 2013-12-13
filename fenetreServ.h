@@ -21,7 +21,6 @@ class fenetreServ : public QWidget
 		void printMessage(QString);
 
 	public slots: 
-		void newConnection();
 
 	private slots:
 		void button_clicked();

@@ -45,26 +45,24 @@ void httpServer::getClientRequest()
 	if(client->canReadLine())
 	{
 		QStringList lines = QString(client->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
-		if(lines[0] == "GET" && QFile::exists(lines[1]))
+		if(lines[0] == "GET")
 		{
 			viewMessage(QString("Envoi de ")+lines[1]);
-			QFile catalogue(lines[1].toLocal8Bit().constData());
+			QFile catalogue("catalog.txt");
 			catalogue.open(QIODevice::ReadOnly);
 			QTextStream os(client);
 			QTextStream is(&catalogue);
 			os.setAutoDetectUnicode(true);
 			is.setAutoDetectUnicode(true);
-			os << "HTTP/1.0 200 OK\r\nhttpServer: TP_Serveur_3208\r\nConnection: Keep-Alive\r\nContent-Type: text/txt\r\nContent-Length: " << catalogue.size() << "\r\n\r\n";
-			QString line;
-			do
+			os << "HTTP/1.1 200 OK\r\nServer: TP_Serveur_3208\r\nConnection: Keep-Alive\r\nContent-Type: text/txt\r\nContent-Length: " << catalogue.size() << "\r\n\r\n";
+			QString line = is.readLine();
+			while(!line.isNull())
 			{
+				//line.replace(QString("="), QString(":"));
+				os << line.toLocal8Bit().constData() << "\r\n";
 				line = is.readLine();
-				if(!line.isNull())
-				{
-					os << line.toLocal8Bit().constData() << endl;
-				}
 			}
-			while(!line.isNull());
+			os  << "\r\n";
 			catalogue.close();
 		}
 	}	

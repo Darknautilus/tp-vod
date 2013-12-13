@@ -4,8 +4,10 @@ CONFIG += qt
 TARGET = bin/insavod
 HEADERS += httpServer.h \
 					fenetreServ.h \
-					insavodServer.h
+					insavodServer.h \
+					insavodTcpServer.h
 SOURCES += insavod.cpp \
 					httpServer.cpp \
 					fenetreServ.cpp \
-					insavodServer.cpp
+					insavodServer.cpp \
+					insavodTcpServer.cpp
