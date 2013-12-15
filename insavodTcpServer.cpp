@@ -1,6 +1,3 @@
-#include <iostream>
-#include <QTcpSocket>
-
 #include "insavodTcpServer.h"
 
 insavodTcpServer::insavodTcpServer(QString _name, int _port, fenetreServ * _view) : insavodServer(_name, _view, _port)

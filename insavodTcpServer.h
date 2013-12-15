@@ -2,7 +2,7 @@
 #define _INSAVODTCPSERVER_H_
 
 #include <QTcpServer>
-#include <QStringList>
+#include <QTcpSocket>
 
 #include "insavodServer.h"
 
