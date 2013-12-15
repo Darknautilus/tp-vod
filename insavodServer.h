@@ -9,21 +9,13 @@
 class insavodServer
 {
 	public:
-		enum protocol
-		{
-			TCP_PULL,
-			TCP_PUSH,
-			UDP_PULL,
-			UDP_PUSH,
-			MCAST_PUSH
-		};
-
 		insavodServer(QString _name, fenetreServ *_view, int _port = 0);
 		virtual ~insavodServer();
 
 		virtual void start();
 		virtual void stop();
-
+		virtual void sendImage(QString);
+		
 		void viewMessage(QString);
 
 	protected:

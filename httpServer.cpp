@@ -1,6 +1,5 @@
 #include <iostream>
 #include <QTcpSocket>
-#include <QString>
 #include <QStringList>
 #include <QTextStream>
 

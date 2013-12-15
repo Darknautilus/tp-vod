@@ -19,6 +19,11 @@ void insavodServer::stop()
 	viewMessage(QString::fromUtf8("arrêté sur le port ")+QString::number(port));
 }
 
+void insavodServer::sendImage(QString imgName)
+{
+	viewMessage("Envoi de "+imgName);
+}
+
 void insavodServer::viewMessage(QString message)
 {
 	view->printMessage(QString("[")+name+QString("] ")+message);

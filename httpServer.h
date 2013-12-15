@@ -42,7 +42,7 @@ class httpServer : public QTcpServer, public insavodServer
 
 	public:
 		httpServer(QString, int, fenetreServ *);
-		~httpServer();
+		virtual ~httpServer();
 
 		void start();
 		void stop();
