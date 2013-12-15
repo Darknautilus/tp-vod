@@ -1,11 +1,9 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-#include <QTcpServer>
 #include <QFile>
-#include <QString>
 
-#include "insavodServer.h"
+#include "insavodTcpServer.h"
 
 class fenetreServ;
 
@@ -36,7 +34,7 @@ inline QHash<int,QString> createFluxHash()
 
 const QHash<int,QString> fluxParams = createFluxHash();
 
-class httpServer : public QTcpServer, public insavodServer
+class httpServer : public insavodTcpServer
 {
 	Q_OBJECT
 
@@ -49,11 +47,7 @@ class httpServer : public QTcpServer, public insavodServer
 		
 		QString parseCatalog();
 
-	protected:
-		virtual void incomingConnection(int);
-
 	public slots:
-		void clientDisconnected();
 		void getClientRequest();
 };
 

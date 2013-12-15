@@ -11,8 +11,8 @@ class insavodTcpServer : public QTcpServer, public insavodServer
 		insavodTcpServer(QString, int, fenetreServ *);
 		virtual ~insavodTcpServer();
 
-		void start();
-		void stop();
+		virtual void start();
+		virtual void stop();
 		void sendImage(QString);
 
 	protected:

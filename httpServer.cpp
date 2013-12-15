@@ -8,7 +8,7 @@
 
 using namespace std;
 
-httpServer::httpServer(QString _name, int _port, fenetreServ *_view) : insavodServer(_name, _view, _port)
+httpServer::httpServer(QString _name, int _port, fenetreServ *_view) : insavodTcpServer(_name, _port, _view)
 {
 }
 
@@ -19,16 +19,14 @@ httpServer::~httpServer()
 
 void httpServer::start()
 {
-	insavodServer::start();
-	listen(addr,port);
+	insavodTcpServer::start();
 	parseCatalog();
 }
 
 void httpServer::stop()
 {
+	insavodTcpServer::stop();
 	QFile::remove(QCoreApplication::applicationDirPath()+"/catalog.tmp");
-	insavodServer::stop();
-	close();
 }
 
 QString httpServer::parseCatalog()
@@ -120,15 +118,6 @@ QString httpServer::parseCatalog()
 	return scatalog;
 }
 
-void httpServer::incomingConnection(int socketDesc)
-{
-	QTcpSocket *client = new QTcpSocket();
-	client->setSocketDescriptor(socketDesc);
-	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
-	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
-	clientConnections.append(client);
-}
-
 void httpServer::getClientRequest()
 {
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());	
@@ -152,13 +141,4 @@ void httpServer::getClientRequest()
 			catalogue.close();
 		}
 	}	
-}
-
-void httpServer::clientDisconnected()
-{
-	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());		 
-	if (!client)
-		return;		 
-	clientConnections.removeAll(client);
-	client->deleteLater();
 }
