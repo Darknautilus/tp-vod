@@ -3,12 +3,14 @@
 
 fenetreServ::fenetreServ()
 {
-	this->resize(1000,500);
+	this->resize(800,400);
 	button = new QPushButton ("Click to plop!", this);
-	button->move(150,220);
+	button->move(400,320);
 	label = new QLabel("Bienvenue sur notre super Serveur de la mort qui tue", this);
+	label->move(400,0);
 	liste = new QListWidget(this);
 	liste->move(0,20);
+	liste->resize(800,300);
 	
 	httpserv = new httpServer(QString("HTTP-Server"), 8081, this);
 	httpserv->start();
