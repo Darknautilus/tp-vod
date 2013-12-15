@@ -1,4 +1,5 @@
 #include "insavodServer.h"
+#include "fenetreServ.h"
 
 insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : name(_name), port(_port), addr(QHostAddress::Any), view(_view)
 {

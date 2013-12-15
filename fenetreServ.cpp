@@ -10,15 +10,19 @@ fenetreServ::fenetreServ()
 	liste = new QListWidget(this);
 	liste->move(0,20);
 	
-	httpserv = new httpServer(QString("HTTP-Server"), 8081, this);
-	httpserv->start();
+	servers.append(new httpServer(QString("HTTP-Server"), 8081, this));
+	servers.append(new insavodTcpServer(QString("TCP-Server"), 8082, this));
+	for(int i=0; i<servers.size(); i++)
+	{
+		servers[i]->start();
+	}
 	
 	QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(button_clicked()));
 }
 
 fenetreServ::~fenetreServ()
 {
-	delete httpserv;
+	servers.clear();
 }
 
 void fenetreServ::printMessage(QString message)

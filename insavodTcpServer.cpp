@@ -1,6 +1,5 @@
 #include <iostream>
 #include <QTcpSocket>
-#include <QStringList>
 
 #include "insavodTcpServer.h"
 

@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QListWidgetItem>
 
-class httpServer;
+class insavodServer;
 
 class fenetreServ : public QWidget
 {
@@ -30,7 +30,7 @@ class fenetreServ : public QWidget
 		QPushButton *button;
 		QLabel *label;
 
-		httpServer *httpserv;
+		QList<insavodServer*> servers;
 };
 
 	

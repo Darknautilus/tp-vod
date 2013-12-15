@@ -2,11 +2,14 @@
 #define _INSAVODTCPSERVER_H_
 
 #include <QTcpServer>
+#include <QStringList>
 
 #include "insavodServer.h"
 
 class insavodTcpServer : public QTcpServer, public insavodServer
 {
+	Q_OBJECT
+
 	public:
 		insavodTcpServer(QString, int, fenetreServ *);
 		virtual ~insavodTcpServer();

@@ -1,10 +1,11 @@
 #ifndef _INSAVODSERVER_H_
 #define _INSAVODSERVER_H_
 
+#include <QObject>
 #include <QString>
 #include <QHostAddress>
 
-#include "fenetreServ.h"
+class fenetreServ;
 
 class insavodServer
 {
