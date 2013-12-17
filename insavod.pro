@@ -5,9 +5,9 @@ TARGET = bin/insavod
 HEADERS += httpServer.h \
 					fenetreServ.h \
 					insavodServer.h \
-					insavodTcpServer.h
+					insavodTcpServer.h 
 SOURCES += insavod.cpp \
 					httpServer.cpp \
 					fenetreServ.cpp \
 					insavodServer.cpp \
-					insavodTcpServer.cpp
+					insavodTcpServer.cpp 
