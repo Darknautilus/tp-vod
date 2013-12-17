@@ -1,35 +1,8 @@
 #include "insavodServer.h"
 #include "fenetreServ.h"
 
-typedef insavodServer::protocol insavodProtocol;
-
-static const std::map<insavodProtocol,const char *> mkStrProtocols()
-{
-	std::map<insavodProtocol, const char *> tmp;
-	tmp[insavodProtocol::TCP_PULL] = "TCP_PULL";
-	tmp[insavodProtocol::TCP_PUSH] = "TCP_PUSH";
-	tmp[insavodProtocol::UDP_PULL] = "UDP_PULL";
-	tmp[insavodProtocol::UDP_PUSH] = "UDP_PUSH";
-	tmp[insavodProtocol::MCAST_PUSH] = "MCAST_PUSH";
-	return tmp;
-}
-
-const QHash<int,QString> createFluxHash()
-{
-	QHash<int,QString> ret;
-	ret[1] = "ID: ";
-	ret[2] = "Name: ";
-	ret[3] = "Type: ";
-	ret[4] = "Address: ";
-	ret[5] = "Port: ";
-	ret[6] = "Protocol: ";
-	ret[7] = "IPS: ";
-	return ret;
-}
-
-const std::map<insavodProtocol,const char *> insavodServer::strProtocols = mkStrProtocols();
-const QHash<int,QString> insavodServer::fluxParams = createFluxHash();
-
+const QMap<insavodProtocol, QString> insavodServer::strProtocols = mkStrProtocols();
+const QHash<insavodFluxParam, QString> insavodServer::fluxParams = createFluxHash();
 
 insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : name(_name), port(_port), addr(QHostAddress::Any), APP_PATH(_view->getAppDirPath()), view(_view)
 {
@@ -60,6 +33,20 @@ void insavodServer::viewMessage(QString message)
 	view->printMessage(QString("[")+name+QString("] ")+message);
 }
 
+insavodProtocol insavodServer::protocolFromStr(QString str)
+{
+	QMapIterator<insavodProtocol,QString> i(strProtocols);
+	while(i.hasNext())
+	{
+		i.next();
+		if(str == i.value())
+		{
+			return i.key();
+		}
+	}
+	return insavodProtocol::NULL_PROTOCOL;
+}
+
 void insavodServer::parseCatalog()
 {
 	QString line;
@@ -73,6 +60,7 @@ void insavodServer::parseCatalog()
 		QStringList sflux;
 		QFile startup(APP_PATH+"/startup.txt");
 		startup.open(QIODevice::ReadOnly | QIODevice::Text);
+		viewMessage("Reading startup.txt");
 		QTextStream sstartup(&startup);
 		line = sstartup.readLine();
 		int i=1;
@@ -90,53 +78,86 @@ void insavodServer::parseCatalog()
 			line = sstartup.readLine();
 			i++;
 		}
-		QList<fluxInfo> flux;
 		for(i=0;i<sflux.size();i++)
 		{
+			//fluxInfo fi;
+			int fluxId = -1;
+			fluxDesc flux_desc;
+			bool idSet = false;
+			bool nameSet = false;
+			bool protocolSet = false;
+			bool ipsSet = false;
+			bool portSet = false;
+			bool typeSet = false;
+			bool addressSet = false;
+			
 			QFile flux(APP_PATH+"/"+sflux[i]);
 			flux.open(QIODevice::ReadOnly | QIODevice::Text);
+			viewMessage("Reading "+sflux[i]);
 			QTextStream sflux(&flux);
-			fluxInfo fi;
+			
 			line = sflux.readLine();
-			int j=1;
 			while(!line.isNull())
 			{
 				// Analyse du flux
-				switch(j)
+				if(!idSet && line.contains(fluxParams[insavodFluxParam::ID], Qt::CaseInsensitive))
 				{
-					case 1:
-						fi.id = line.remove(fluxParams[j]);
-						break;
-					case 2:
-						fi.name = line.remove(fluxParams[j]);
-						break;
-					case 3:
-						fi.type = line.remove(fluxParams[j]);
-						break;
-					case 4:
-						fi.address = line.remove(fluxParams[j]);
-						break;
-					case 5:
-						fi.port = line.remove(fluxParams[j]);
-						break;
-					case 6:
-						fi.protocol = line.remove(fluxParams[j]);
-						break;
-					case 7:
-						fi.ips = line.remove(fluxParams[j]);
-						break;
-					default:
-						fi.files << line;
-						break;	
+					fluxId = line.remove(fluxParams[insavodFluxParam::ID], Qt::CaseInsensitive).toInt();
+					idSet = true;
+				}
+				else if(!nameSet && line.contains(fluxParams[insavodFluxParam::NAME], Qt::CaseInsensitive))
+				{
+					flux_desc.name = line.remove(fluxParams[insavodFluxParam::NAME], Qt::CaseInsensitive);
+					nameSet = true;
+				}
+				else if(!protocolSet && line.contains(fluxParams[insavodFluxParam::PROTOCOL], Qt::CaseInsensitive))
+				{
+					flux_desc.protocolCode = protocolFromStr(line.remove(fluxParams[insavodFluxParam::PROTOCOL], Qt::CaseInsensitive));
+					protocolSet = true;
+				}
+				else if(!ipsSet && line.contains(fluxParams[insavodFluxParam::IPS], Qt::CaseInsensitive))
+				{
+					flux_desc.ips = line.remove(fluxParams[insavodFluxParam::IPS], Qt::CaseInsensitive).toFloat();
+					ipsSet = true;
+				}
+				else if(!portSet && line.contains(fluxParams[insavodFluxParam::PORT], Qt::CaseInsensitive))
+				{
+					flux_desc.port = line.remove(fluxParams[insavodFluxParam::PORT], Qt::CaseInsensitive).toInt();
+					portSet = true;
+				}
+				else if(!typeSet && line.contains(fluxParams[insavodFluxParam::TYPE], Qt::CaseInsensitive))
+				{
+					flux_desc.type = line.remove(fluxParams[insavodFluxParam::TYPE], Qt::CaseInsensitive);
+					typeSet = true;
+				}
+				else if(!addressSet && line.contains(fluxParams[insavodFluxParam::ADDRESS], Qt::CaseInsensitive))
+				{
+					flux_desc.address = line.remove(fluxParams[insavodFluxParam::ADDRESS], Qt::CaseInsensitive);
+					addressSet = true;
+				}
+				else
+				{
+					flux_desc.files.append(new QFile(line));
 				}
 				line = sflux.readLine();
-				j++;
 			}
-			QString object("Object ID="+fi.id+" name="+fi.name+" type="+fi.type+" address="+fi.address+" port="+fi.port+" protocol="+fi.protocol+" ips="+fi.ips+" ");
-			cos << object << "\r\n";
+			if(addressSet && typeSet && portSet && ipsSet && protocolSet && nameSet && idSet)
+			{
+				fluxMap.insert(fluxId,flux_desc);
+			}
 			flux.close();
 		}
 		startup.close();
+
+		for(QMap<int,fluxDesc>::const_iterator it = fluxMap.constBegin(); it != fluxMap.constEnd(); ++it)
+		{
+			cos << "Object ID=" << it.key() << " name=" << it.value().name << " type=" << it.value().type << " address=" << it.value().address << " port=" << it.value().port << " protocol=" << strProtocols[it.value().protocolCode] << " ips=" << it.value().ips << " \r\n";
+		}
+	}
+	else
+	{
+		viewMessage("startup.txt file couldn't be found");
+		stop();
 	}
 	cos << "\r\n";
 	catalog.close();
