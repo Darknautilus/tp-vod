@@ -1,7 +1,37 @@
 #include "insavodServer.h"
 #include "fenetreServ.h"
 
-insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : name(_name), port(_port), addr(QHostAddress::Any), view(_view)
+typedef insavodServer::protocol insavodProtocol;
+
+static const std::map<insavodProtocol,const char *> mkStrProtocols()
+{
+	std::map<insavodProtocol, const char *> tmp;
+	tmp[insavodProtocol::TCP_PULL] = "TCP_PULL";
+	tmp[insavodProtocol::TCP_PUSH] = "TCP_PUSH";
+	tmp[insavodProtocol::UDP_PULL] = "UDP_PULL";
+	tmp[insavodProtocol::UDP_PUSH] = "UDP_PUSH";
+	tmp[insavodProtocol::MCAST_PUSH] = "MCAST_PUSH";
+	return tmp;
+}
+
+const QHash<int,QString> createFluxHash()
+{
+	QHash<int,QString> ret;
+	ret[1] = "ID: ";
+	ret[2] = "Name: ";
+	ret[3] = "Type: ";
+	ret[4] = "Address: ";
+	ret[5] = "Port: ";
+	ret[6] = "Protocol: ";
+	ret[7] = "IPS: ";
+	return ret;
+}
+
+const std::map<insavodProtocol,const char *> insavodServer::strProtocols = mkStrProtocols();
+const QHash<int,QString> insavodServer::fluxParams = createFluxHash();
+
+
+insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : name(_name), port(_port), addr(QHostAddress::Any), APP_PATH(_view->getAppDirPath()), view(_view)
 {
 }
 
@@ -30,12 +60,9 @@ void insavodServer::viewMessage(QString message)
 	view->printMessage(QString("[")+name+QString("] ")+message);
 }
 
-QString insavodServer::parseCatalog()
+void insavodServer::parseCatalog()
 {
-	QString APP_PATH = QCoreApplication::applicationDirPath();
 	QString line;
-	QString scatalog;
-	QTextStream os(&scatalog);
 
 	QFile catalog(APP_PATH+"/catalog.tmp");
 	catalog.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -55,7 +82,6 @@ QString insavodServer::parseCatalog()
 			if(i <= 2)
 			{
 				cos << line << "\r\n";
-				os << line << endl;
 			}
 			else
 			{
@@ -108,13 +134,10 @@ QString insavodServer::parseCatalog()
 			}
 			QString object("Object ID="+fi.id+" name="+fi.name+" type="+fi.type+" address="+fi.address+" port="+fi.port+" protocol="+fi.protocol+" ips="+fi.ips+" ");
 			cos << object << "\r\n";
-			os << object << endl;
 			flux.close();
 		}
 		startup.close();
 	}
 	cos << "\r\n";
-	os << endl;
 	catalog.close();
-	return scatalog;
 }

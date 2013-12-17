@@ -8,37 +8,26 @@
 
 class fenetreServ;
 
-struct fluxInfo
-{
-	QString id;
-	QString name;
-	QString protocol;
-	QString address;
-	QString port;
-	QString type;
-	QString ips;
-	QStringList files;
-};
-
-inline QHash<int,QString> createFluxHash()
-{
-	QHash<int,QString> ret;
-	ret[1] = "ID: ";
-	ret[2] = "Name: ";
-	ret[3] = "Type: ";
-	ret[4] = "Address: ";
-	ret[5] = "Port: ";
-	ret[6] = "Protocol: ";
-	ret[7] = "IPS: ";
-	return ret;
-}
-
-const QHash<int,QString> fluxParams = createFluxHash();
-
-
 class insavodServer
 {
 	public:
+		enum protocol
+		{
+			TCP_PULL,
+			TCP_PUSH,
+			UDP_PULL,
+			UDP_PUSH,
+			MCAST_PUSH
+		};
+		
+		struct fluxDesc
+		{
+			QString name;
+			protocol protocolCode;
+			float ips;
+			QList<QFile> files;
+		};
+		
 		insavodServer(QString _name, fenetreServ *_view, int _port = 0);
 		virtual ~insavodServer();
 
@@ -47,17 +36,34 @@ class insavodServer
 		virtual void sendImage(QString);
 		
 		void viewMessage(QString);
-		QString parseCatalog();
+		void parseCatalog();
+	
+		static const std::map<protocol,const char *> strProtocols;
 	
 	protected:
 		QString name;
 		int port;
 		QHostAddress addr;
 		QList<QAbstractSocket *> clientConnections;
+		QMap<int,fluxDesc> flux;
+		QString APP_PATH;
 	
 	private:
+		struct fluxInfo
+		{
+			QString id;
+			QString name;
+			QString protocol;
+			QString address;
+			QString port;
+			QString type;
+			QString ips;
+			QStringList files;
+		};
+		
 		fenetreServ *view;
-
+		static const QHash<int,QString> fluxParams;
+		
 };
 
 #endif

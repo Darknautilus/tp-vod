@@ -19,8 +19,7 @@ class fenetreServ : public QWidget
 		virtual ~fenetreServ();
 
 		void printMessage(QString);
-
-	public slots: 
+		QString getAppDirPath();
 
 	private slots:
 		void button_clicked();

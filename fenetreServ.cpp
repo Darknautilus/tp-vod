@@ -25,6 +25,11 @@ fenetreServ::~fenetreServ()
 	servers.clear();
 }
 
+QString fenetreServ::getAppDirPath()
+{
+	return QCoreApplication::applicationDirPath(); 
+}
+
 void fenetreServ::printMessage(QString message)
 {
 	new QListWidgetItem(message, liste);
