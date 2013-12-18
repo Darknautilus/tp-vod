@@ -4,7 +4,7 @@
 const QMap<insavodProtocol, QString> insavodServer::strProtocols = mkStrProtocols();
 const QHash<insavodFluxParam, QString> insavodServer::fluxParams = createFluxHash();
 
-insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : name(_name), port(_port), addr(QHostAddress::Any), APP_PATH(_view->getAppDirPath()), view(_view)
+insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : APP_PATH(_view->getAppDirPath()),name(_name), port(_port), addr(QHostAddress::Any), view(_view)
 {
 }
 
@@ -47,8 +47,9 @@ insavodProtocol insavodServer::protocolFromStr(QString str)
 	return insavodProtocol::NULL_PROTOCOL;
 }
 
-void insavodServer::parseCatalog()
+void insavodServer::parseCatalog(insavodServer *server)
 {
+	QString APP_PATH = server->APP_PATH;
 	QString line;
 
 	QFile catalog(APP_PATH+"/catalog.tmp");
@@ -60,7 +61,7 @@ void insavodServer::parseCatalog()
 		QStringList sflux;
 		QFile startup(APP_PATH+"/startup.txt");
 		startup.open(QIODevice::ReadOnly | QIODevice::Text);
-		viewMessage("Reading startup.txt");
+		server->viewMessage("Reading startup.txt");
 		QTextStream sstartup(&startup);
 		line = sstartup.readLine();
 		int i=1;
@@ -93,7 +94,7 @@ void insavodServer::parseCatalog()
 			
 			QFile flux(APP_PATH+"/"+sflux[i]);
 			flux.open(QIODevice::ReadOnly | QIODevice::Text);
-			viewMessage("Reading "+sflux[i]);
+			server->viewMessage("Reading "+sflux[i]);
 			QTextStream sflux(&flux);
 			
 			line = sflux.readLine();
@@ -143,28 +144,28 @@ void insavodServer::parseCatalog()
 					}
 					else
 					{
-						viewMessage("Erreur dans le flux : image non trouvée");
+						server->viewMessage("Erreur dans le flux : image non trouvée");
 					}
 				}
 				line = sflux.readLine();
 			}
 			if(addressSet && typeSet && portSet && ipsSet && protocolSet && nameSet && idSet)
 			{
-				fluxMap.insert(fluxId,flux_desc);
+				insavodServer::fluxMap.insert(fluxId,flux_desc);
 			}
 			flux.close();
 		}
 		startup.close();
 
-		for(QMap<int,fluxDesc>::const_iterator it = fluxMap.constBegin(); it != fluxMap.constEnd(); ++it)
+		for(QMap<int,fluxDesc>::const_iterator it = insavodServer::fluxMap.constBegin(); it != insavodServer::fluxMap.constEnd(); ++it)
 		{
 			cos << "Object ID=" << it.key() << " name=" << it.value().name << " type=" << it.value().type << " address=" << it.value().address << " port=" << it.value().port << " protocol=" << strProtocols[it.value().protocolCode] << " ips=" << it.value().ips << " \r\n";
 		}
 	}
 	else
 	{
-		viewMessage("startup.txt file couldn't be found");
-		stop();
+		server->viewMessage("startup.txt file couldn't be found");
+		server->stop();
 	}
 	cos << "\r\n";
 	catalog.close();

@@ -12,12 +12,14 @@ insavodTcpServer::~insavodTcpServer()
 void insavodTcpServer::start()
 {
 	insavodServer::start();
+	dataConnection = new QTcpSocket();
 	listen(addr,port);
 }
 
 void insavodTcpServer::stop()
 {
 	insavodServer::stop();
+	delete dataConnection;
 	close();
 }
 
@@ -33,7 +35,6 @@ void insavodTcpServer::incomingConnection(int socketDesc)
 	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
 	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
 	clientConnections.append(client);
-	dataConnection = new QTcpSocket();
 }
 
 void insavodTcpServer::getClientRequest()
@@ -60,9 +61,10 @@ void insavodTcpServer::getClientRequest()
 					{
 						currentImage = id;
 					}
-					if(fluxMap[currentFlux].files.size() >= currentImage)
+					qout << insavodServer::fluxMap[currentFlux].files.size() << endl;
+					if(insavodServer::fluxMap[currentFlux].files.size() >= currentImage)
 					{
-						QFile *currentImageDesc = fluxMap[currentFlux].files[currentImage-1];
+						QFile *currentImageDesc = insavodServer::fluxMap[currentFlux].files[currentImage-1];
 						qout << "Image " << currentImage << " du flux " << currentFlux << endl;
 						if(currentImageDesc->open(QIODevice::ReadOnly))
 						{
@@ -107,5 +109,4 @@ void insavodTcpServer::clientDisconnected()
 		return;		 
 	clientConnections.removeAll(client);
 	client->deleteLater();
-	delete dataConnection;
 }
