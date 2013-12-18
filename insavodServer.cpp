@@ -137,7 +137,14 @@ void insavodServer::parseCatalog()
 				}
 				else
 				{
-					flux_desc.files.append(new QFile(line));
+					if(QFile::exists(APP_PATH+line))
+					{
+						flux_desc.files.append(new QFile(APP_PATH+line));
+					}
+					else
+					{
+						viewMessage("Erreur dans le flux : image non trouvée");
+					}
 				}
 				line = sflux.readLine();
 			}

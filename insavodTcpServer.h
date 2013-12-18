@@ -20,6 +20,12 @@ class insavodTcpServer : public QTcpServer, public insavodServer
 
 	protected:
 		virtual void incomingConnection(int);
+
+	private:
+		bool dataConnected;
+		QTcpSocket *dataConnection;
+		int currentImage;
+		int currentFlux;
 	
 	public slots:
 		void clientDisconnected();
