@@ -43,7 +43,9 @@ void insavodTcpServer::getClientRequest()
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());	
 	if(client->canReadLine())
 	{
-		QStringList lines = QString(client->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
+		QString req(client->readLine());
+		qout << req << endl;
+		QStringList lines = req.split(QRegExp("[ \r\n][ \r\n]*"));
 		for(int i=0;i<lines.size();i++)
 		{
 			qout << lines[i] << endl;
@@ -61,16 +63,14 @@ void insavodTcpServer::getClientRequest()
 					{
 						currentImage = id;
 					}
-					qout << insavodServer::fluxMap[currentFlux].files.size() << endl;
 					if(insavodServer::fluxMap[currentFlux].files.size() >= currentImage)
 					{
 						QFile *currentImageDesc = insavodServer::fluxMap[currentFlux].files[currentImage-1];
-						qout << "Image " << currentImage << " du flux " << currentFlux << endl;
 						if(currentImageDesc->open(QIODevice::ReadOnly))
 						{
-							qout << "Envoi de l'image " << currentImageDesc->fileName() << endl;
+							qout << "Envoi de l'image " << currentImageDesc->fileName() << "(" << currentImageDesc->size() << ")" << endl;
 							QDataStream os(dataConnection);
-							os << currentImage << "\r\n" << currentImageDesc->size() << "\r\n" << currentImageDesc->readAll();
+							os << currentImage << "\r\n" << currentImageDesc->size() << "\r\n" << currentImageDesc->readAll() << "\r\n";
 							currentImageDesc->close();
 						}
 					}
@@ -78,6 +78,7 @@ void insavodTcpServer::getClientRequest()
 				else
 				{
 					currentFlux = id;
+					QTextStream os(client);
 				}
 			}
 		}

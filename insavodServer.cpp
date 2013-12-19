@@ -3,6 +3,7 @@
 
 const QMap<insavodProtocol, QString> insavodServer::strProtocols = mkStrProtocols();
 const QHash<insavodFluxParam, QString> insavodServer::fluxParams = createFluxHash();
+QMap<int,insavodFluxDesc> insavodServer::fluxMap = QMap<int,insavodFluxDesc>();
 
 insavodServer::insavodServer(QString _name, fenetreServ *_view, int _port) : APP_PATH(_view->getAppDirPath()),name(_name), port(_port), addr(QHostAddress::Any), view(_view)
 {

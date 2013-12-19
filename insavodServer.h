@@ -5,6 +5,7 @@
 #include <QHostAddress>
 #include <QStringList>
 #include <QFile>
+#include <QMap>
 
 class fenetreServ;
 
@@ -77,6 +78,7 @@ class insavodServer
 
 typedef insavodServer::protocol insavodProtocol;
 typedef insavodServer::fluxParamCode insavodFluxParam;
+typedef insavodServer::fluxDesc insavodFluxDesc;
 
 inline const QMap<insavodProtocol, QString> mkStrProtocols()
 {
