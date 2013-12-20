@@ -33,7 +33,6 @@ void insavodTcpServer::incomingConnection(int socketDesc)
 	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
 	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
 	clientConnections.append(client);
-	dataConnection = new QTcpSocket();
 }
 
 void insavodTcpServer::getClientRequest()
@@ -103,9 +102,14 @@ void insavodTcpServer::getClientRequest()
 void insavodTcpServer::clientDisconnected()
 {
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());		 
+	int a=0;
 	if (!client)
-		return;		 
+	{
+	}
+	else 
+	{	
 	clientConnections.removeAll(client);
 	client->deleteLater();
+	}
 	delete dataConnection;
 }

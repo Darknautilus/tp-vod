@@ -1,5 +1,6 @@
 #include "fenetreServ.h"
 #include "httpServer.h"
+#include "insavodUdpServer.h"
 
 fenetreServ::fenetreServ()
 {
@@ -12,13 +13,16 @@ fenetreServ::fenetreServ()
 	liste->move(0,20);
 	liste->resize(800,300);
 	
+	//Démarrage des différents serveurs
 	servers.append(new httpServer(QString("HTTP-Server"), 8081, this));
 	servers.append(new insavodTcpServer(QString("TCP-Server"), 8082, this));
+	servers.append(new insavodUdpServer(QString("UDP-Server"), 8083, this));
 	for(int i=0; i<servers.size(); i++)
 	{
 		servers[i]->start();
 	}
-	
+
+	// click to plop !
 	QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(button_clicked()));
 }
 

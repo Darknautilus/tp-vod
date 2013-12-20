@@ -1,5 +1,4 @@
 #include <iostream>
-#include <QUdpSocket>
 #include <QStringList>
 
 #include "insavodUdpServer.h"
@@ -15,13 +14,33 @@ insavodUdpServer::~insavodUdpServer()
 void insavodUdpServer::start()
 {
 	insavodServer::start();
-	listen(addr,port);
+
+	socketUdpServer = new QUdpSocket();
+	socketUdpServer->bind(8083, QUdpSocket::ShareAddress);
+/*	//Attend indéfiniment que de nouvelles informations soient disponibles
+	while (socketUdpServer->waitForReadyRead(-1))
+	{
+		//Vérifie s'il y a des informations en attente d'être lues
+		while (socketUdpServer->hasPendingDatagrams())
+		{*/
+	connect(socketUdpServer, SIGNAL(readyRead()), this, SLOT (getClientRequest()));
+
+	QByteArray datagram;
+	datagram.resize(socketUdpServer->pendingDatagramSize());
+		
+	QHostAddress adresseClient;
+	quint16 portClient;
+
+	socketUdpServer->readDatagram(datagram.data(), datagram.size(), &adresseClient, &portClient);
+	viewMessage("Informations recues du client"+adresseClient.toString());
+
 }
 
 void insavodUdpServer::stop()
 {
 	insavodServer::stop();
-	close();
+	socketUdpServer->close();
+	delete socketUdpServer;
 }
 
 void insavodUdpServer::sendImage(QString imgName)
@@ -29,14 +48,23 @@ void insavodUdpServer::sendImage(QString imgName)
 	insavodServer::sendImage(imgName);
 }
 
-void insavodUdpServer::incomingConnection(int socketDesc)
+/*void insavodUdpServer::incomingConnection(int socketDesc)
 {
-	QUdpSocket *client = new QUdpSocket();
 	client->setSocketDescriptor(socketDesc);
 	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
+}
+*/
+
+/*void insavodUdpServer::incomingConnection(int sock)
+{
+ 	QUdpSocket *client = new QUdpSocket();
+	client->setSocketDescriptor(sock);
+	QObject::connect(client,SIGNAL(readyRead()), this, SLOT(getClientRequest()));
 	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
 	clientConnections.append(client);
+	dataConnection = new QUdpSocket();
 }
+*/
 
 void insavodUdpServer::getClientRequest()
 {
@@ -44,14 +72,19 @@ void insavodUdpServer::getClientRequest()
 	if(client->canReadLine())
 	{
 		QStringList lines = QString(client->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
-	}	
+	}
 }
 
 void insavodUdpServer::clientDisconnected()
 {
 	QUdpSocket *client = qobject_cast<QUdpSocket *>(sender());		 
 	if (!client)
-		return;		 
+	{
+	}
+	else 
+	{	
 	clientConnections.removeAll(client);
 	client->deleteLater();
+	}
+	delete dataConnection;
 }
