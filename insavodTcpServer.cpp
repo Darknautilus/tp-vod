@@ -99,8 +99,14 @@ void insavodTcpServer::getClientRequest()
 void insavodTcpServer::clientDisconnected()
 {
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());		 
+	int a=0;
 	if (!client)
-		return;		 
+	{
+	}
+	else 
+	{	
 	clientConnections.removeAll(client);
 	client->deleteLater();
+	}
+	delete dataConnection;
 }
