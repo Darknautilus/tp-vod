@@ -20,3 +20,4 @@ bin
 Makefile
 moc_*
 Testing
+win32

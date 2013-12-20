@@ -1,5 +1,6 @@
 QT += network
 QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_LFLAGS += -static-libgcc
 CONFIG += qt
 TARGET = bin/insavod
 HEADERS += httpServer.h \
