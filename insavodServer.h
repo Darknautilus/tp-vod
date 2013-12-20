@@ -5,6 +5,7 @@
 #include <QHostAddress>
 #include <QStringList>
 #include <QFile>
+#include <QMap>
 
 class fenetreServ;
 
@@ -56,18 +57,18 @@ class insavodServer
 		virtual void sendImage(QString);
 		
 		void viewMessage(QString);
-		void parseCatalog();
+		static void parseCatalog(insavodServer *);
 	
 		static const QMap<protocol, QString> strProtocols;
 		static protocol protocolFromStr(QString);
+		QString APP_PATH;
+		static QMap<int,fluxDesc> fluxMap;
 	
 	protected:
 		QString name;
 		int port;
 		QHostAddress addr;
 		QList<QAbstractSocket *> clientConnections;
-		QMap<int,fluxDesc> fluxMap;
-		QString APP_PATH;
 	
 	private:
 		fenetreServ *view;
@@ -77,6 +78,7 @@ class insavodServer
 
 typedef insavodServer::protocol insavodProtocol;
 typedef insavodServer::fluxParamCode insavodFluxParam;
+typedef insavodServer::fluxDesc insavodFluxDesc;
 
 inline const QMap<insavodProtocol, QString> mkStrProtocols()
 {

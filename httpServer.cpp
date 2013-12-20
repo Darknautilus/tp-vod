@@ -13,7 +13,7 @@ httpServer::~httpServer()
 void httpServer::start()
 {
 	insavodTcpServer::start();
-	parseCatalog();
+	insavodServer::parseCatalog(this);
 }
 
 void httpServer::stop()

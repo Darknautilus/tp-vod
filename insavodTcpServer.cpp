@@ -12,12 +12,14 @@ insavodTcpServer::~insavodTcpServer()
 void insavodTcpServer::start()
 {
 	insavodServer::start();
+	dataConnection = new QTcpSocket();
 	listen(addr,port);
 }
 
 void insavodTcpServer::stop()
 {
 	insavodServer::stop();
+	delete dataConnection;
 	close();
 }
 
@@ -37,64 +39,59 @@ void insavodTcpServer::incomingConnection(int socketDesc)
 
 void insavodTcpServer::getClientRequest()
 {
-	QTextStream qout(stdout);
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());	
 	if(client->canReadLine())
 	{
-		QStringList lines = QString(client->readLine()).split(QRegExp("[ \r\n][ \r\n]*"));
-		for(int i=0;i<lines.size();i++)
-		{
-			qout << lines[i] << endl;
-		}
+		QString req(client->readAll());
+		QStringList lines = req.split(QRegExp("[ \r\n][\r\n]*"));
 		if(lines[0] == "GET")
 		{
 			bool isId;
 			int id = lines[1].toInt(&isId);
 			if(isId)
 			{
-				if(dataConnected)
+				if(!dataConnected)
+				{
+					currentFlux = id;
+					QTextStream os(client);
+					if(lines.size() >= 4 && lines[2] == "LISTEN_PORT")
+					{
+						bool isPort;
+						int port = lines[3].toInt(&isPort);
+						if(isPort && !dataConnected)
+						{
+							dataConnection->connectToHost(client->peerAddress(), port);
+							if(dataConnection->waitForConnected(1000))
+							{
+								dataConnected = true;
+							}
+						}
+					}
+				}
+				else
 				{
 					// Envoi de l'image id
 					if(id > 0)
 					{
 						currentImage = id;
 					}
-					if(fluxMap[currentFlux].files.size() >= currentImage)
+					if(insavodServer::fluxMap[currentFlux].files.size() >= currentImage)
 					{
-						QFile *currentImageDesc = fluxMap[currentFlux].files[currentImage-1];
-						qout << "Image " << currentImage << " du flux " << currentFlux << endl;
+						QFile *currentImageDesc = insavodServer::fluxMap[currentFlux].files[currentImage-1];
 						if(currentImageDesc->open(QIODevice::ReadOnly))
 						{
-							qout << "Envoi de l'image " << currentImageDesc->fileName() << endl;
 							QDataStream os(dataConnection);
 							os << currentImage << "\r\n" << currentImageDesc->size() << "\r\n" << currentImageDesc->readAll();
 							currentImageDesc->close();
 						}
 					}
 				}
-				else
-				{
-					currentFlux = id;
-				}
 			}
 		}
-		else if(lines[0] == "LISTEN_PORT")
+		else if(lines[0] == "END" && dataConnected)
 		{
-			bool isPort;
-			int port = lines[1].toInt(&isPort);
-			if(isPort && !dataConnected)
-			{
-				dataConnection->connectToHost(client->peerAddress(), port);
-				if(dataConnection->waitForConnected(1000))
-				{
-					qout << "Connected to " << client->peerAddress().toString() << ":" << port << endl;
-					dataConnected = true;
-				}
-				else
-				{
-					qout << "Not connected" << endl;
-				}
-			}
+			dataConnected = false;
+			dataConnection->disconnectFromHost();
 		}
 	}	
 }
