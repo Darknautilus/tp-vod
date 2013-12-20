@@ -39,24 +39,36 @@ void insavodTcpServer::incomingConnection(int socketDesc)
 
 void insavodTcpServer::getClientRequest()
 {
-	QTextStream qout(stdout);
 	QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());	
 	if(client->canReadLine())
 	{
-		QString req(client->readLine());
-		qout << req << endl;
-		QStringList lines = req.split(QRegExp("[ \r\n][ \r\n]*"));
-		for(int i=0;i<lines.size();i++)
-		{
-			qout << lines[i] << endl;
-		}
+		QString req(client->readAll());
+		QStringList lines = req.split(QRegExp("[ \r\n][\r\n]*"));
 		if(lines[0] == "GET")
 		{
 			bool isId;
 			int id = lines[1].toInt(&isId);
 			if(isId)
 			{
-				if(dataConnected)
+				if(!dataConnected)
+				{
+					currentFlux = id;
+					QTextStream os(client);
+					if(lines.size() >= 4 && lines[2] == "LISTEN_PORT")
+					{
+						bool isPort;
+						int port = lines[3].toInt(&isPort);
+						if(isPort && !dataConnected)
+						{
+							dataConnection->connectToHost(client->peerAddress(), port);
+							if(dataConnection->waitForConnected(1000))
+							{
+								dataConnected = true;
+							}
+						}
+					}
+				}
+				else
 				{
 					// Envoi de l'image id
 					if(id > 0)
@@ -68,37 +80,18 @@ void insavodTcpServer::getClientRequest()
 						QFile *currentImageDesc = insavodServer::fluxMap[currentFlux].files[currentImage-1];
 						if(currentImageDesc->open(QIODevice::ReadOnly))
 						{
-							qout << "Envoi de l'image " << currentImageDesc->fileName() << "(" << currentImageDesc->size() << ")" << endl;
 							QDataStream os(dataConnection);
-							os << currentImage << "\r\n" << currentImageDesc->size() << "\r\n" << currentImageDesc->readAll() << "\r\n";
+							os << currentImage << "\r\n" << currentImageDesc->size() << "\r\n" << currentImageDesc->readAll();
 							currentImageDesc->close();
 						}
 					}
 				}
-				else
-				{
-					currentFlux = id;
-					QTextStream os(client);
-				}
 			}
 		}
-		else if(lines[0] == "LISTEN_PORT")
+		else if(lines[0] == "END" && dataConnected)
 		{
-			bool isPort;
-			int port = lines[1].toInt(&isPort);
-			if(isPort && !dataConnected)
-			{
-				dataConnection->connectToHost(client->peerAddress(), port);
-				if(dataConnection->waitForConnected(1000))
-				{
-					qout << "Connected to " << client->peerAddress().toString() << ":" << port << endl;
-					dataConnected = true;
-				}
-				else
-				{
-					qout << "Not connected" << endl;
-				}
-			}
+			dataConnected = false;
+			dataConnection->disconnectFromHost();
 		}
 	}	
 }
