@@ -9,6 +9,8 @@
 
 class insavodUdpServer : public QObject, public insavodServer
 {
+	Q_OBJECT
+
 	public:
 		insavodUdpServer(QString, int, fenetreServ *);
 		virtual ~insavodUdpServer();

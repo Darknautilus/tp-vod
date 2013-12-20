@@ -17,12 +17,6 @@ void insavodUdpServer::start()
 
 	socketUdpServer = new QUdpSocket();
 	socketUdpServer->bind(8083, QUdpSocket::ShareAddress);
-/*	//Attend indéfiniment que de nouvelles informations soient disponibles
-	while (socketUdpServer->waitForReadyRead(-1))
-	{
-		//Vérifie s'il y a des informations en attente d'être lues
-		while (socketUdpServer->hasPendingDatagrams())
-		{*/
 	connect(socketUdpServer, SIGNAL(readyRead()), this, SLOT (getClientRequest()));
 
 	QByteArray datagram;
@@ -32,8 +26,6 @@ void insavodUdpServer::start()
 	quint16 portClient;
 
 	socketUdpServer->readDatagram(datagram.data(), datagram.size(), &adresseClient, &portClient);
-	viewMessage("Informations recues du client"+adresseClient.toString());
-
 }
 
 void insavodUdpServer::stop()
@@ -48,23 +40,6 @@ void insavodUdpServer::sendImage(QString imgName)
 	insavodServer::sendImage(imgName);
 }
 
-/*void insavodUdpServer::incomingConnection(int socketDesc)
-{
-	client->setSocketDescriptor(socketDesc);
-	QObject::connect(client, SIGNAL(readyRead()), this, SLOT(getClientRequest()));
-}
-*/
-
-/*void insavodUdpServer::incomingConnection(int sock)
-{
- 	QUdpSocket *client = new QUdpSocket();
-	client->setSocketDescriptor(sock);
-	QObject::connect(client,SIGNAL(readyRead()), this, SLOT(getClientRequest()));
-	QObject::connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
-	clientConnections.append(client);
-	dataConnection = new QUdpSocket();
-}
-*/
 
 void insavodUdpServer::getClientRequest()
 {

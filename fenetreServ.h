@@ -5,9 +5,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QListWidget>
-#include <QPushButton>
 #include <QListWidgetItem>
-
+#include <QVBoxLayout>
 
 class insavodServer;
 
@@ -22,12 +21,8 @@ class fenetreServ : public QWidget
 		void printMessage(QString);
 		QString getAppDirPath();
 
-	private slots:
-		void button_clicked();
-
 	private:
 		QListWidget *liste;
-		QPushButton *button;
 		QLabel *label;
 
 		QList<insavodServer*> servers;

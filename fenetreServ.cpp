@@ -5,13 +5,22 @@
 fenetreServ::fenetreServ()
 {
 	this->resize(800,400);
-	button = new QPushButton ("Click to plop!", this);
-	button->move(400,320);
-	label = new QLabel("Bienvenue sur notre super Serveur de la mort qui tue", this);
-	label->move(400,0);
+	label = new QLabel("<font color=\"#0000A0\">Bienvenue sur le serveur du binome B3208</font>", this);
+	//label->move(400,0);
 	liste = new QListWidget(this);
-	liste->move(0,20);
+	//liste->move(0,20);
 	liste->resize(800,300);
+	
+	//Création du layout et arrangement des widgets
+	QVBoxLayout *layout = new QVBoxLayout;
+	layout->addWidget(label);
+	layout->addWidget(liste);
+
+	//Affectation du Layout à la fenêtre
+	this->setLayout(layout);
+	
+	this->setStyleSheet("Background-color:skyblue");
+liste->setStyleSheet("Background-color:lightblue");
 	
 	//Démarrage des différents serveurs
 	servers.append(new httpServer(QString("HTTP-Server"), 8081, this));
@@ -21,9 +30,6 @@ fenetreServ::fenetreServ()
 	{
 		servers[i]->start();
 	}
-
-	// click to plop !
-	QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(button_clicked()));
 }
 
 fenetreServ::~fenetreServ()
@@ -40,9 +46,3 @@ void fenetreServ::printMessage(QString message)
 {
 	new QListWidgetItem(message, liste);
 }
-
-void fenetreServ::button_clicked()
-{
-	printMessage(QString("plop"));
-}
-
